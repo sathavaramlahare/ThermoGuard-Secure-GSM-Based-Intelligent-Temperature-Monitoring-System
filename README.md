@@ -101,5 +101,12 @@ Code/
 8. Local configuration is protected using a keypad-based password. After successful authentication, users can update the temperature setpoint locally, and the system sends SMS notifications for configuration updates and unauthorized access attempts.
 
 ---
-
+##Applications
+1. Industrial Temperature Monitoring
+2. Smart Home Automation
+3. Laboratories
+4. Hospitals & Medical Storage
+5. Agriculture & Greenhouses
+6. Electrical Panels & Server Rooms
+7. Remote Industrial Automation
 
