@@ -19,7 +19,6 @@ The system supports secure remote configuration using password-protected SMS com
 - Keypad based local configuration
 - UART communication with GSM module
 - External interrupt based password access
-- Persistent configuration after power reset
 
 ---
 
