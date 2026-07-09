@@ -53,21 +53,114 @@ The system supports secure remote configuration using password-protected SMS com
 
 ---
 
-## Project Structure
-
-```
-Code/
-│── main.c
-│── gsm.c
-│── uart.c
-│── adc.c
-│── i2c.c
-│── lcd.c
-│── keypad.c
-│── interrupt.c
-│── local_settings.c
-│── *.h
-```
+## Flow Chart
+                                    START
+                                      │
+                                      ▼
+                          Power ON / System Reset
+                                      │
+                                      ▼
+                  Initialize All Hardware Peripherals
+         ┌───────────────────────────────────────────────────┐
+         │ LCD │ UART │ ADC │ I2C │ GSM │ Keypad │ EINT0 │
+         └───────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+                      Read EEPROM Initialization Flag
+                            (Address 0x40)
+                                      │
+                                      ▼
+                     Is Initialization Flag Present?
+                        (Flag == "1107@s") ?
+                     ┌──────────────┴───────────────┐
+                     │                              │
+                    NO                             YES
+                     │                              │
+                     ▼                              ▼
+         Store Default Configuration        Read Saved Configuration
+         ┌─────────────────────────┐      ┌─────────────────────────┐
+         │ Default Setpoint        │      │ Temperature Setpoint    │
+         │ Default Mobile Number   │      │ Mobile Number           │
+         │ Default Password        │      │ Password                │
+         │ Store Initialization    │      └─────────────────────────┘
+         │ Flag                    │
+         └─────────────────────────┘
+                     │
+                     └──────────────┬─────────────────────┐
+                                    ▼
+                         Initialize GSM Module
+             (AT → ATE0 → CMGF → CMGD → CNMI Commands)
+                                    │
+                                    ▼
+                           Enter Infinite Loop
+                                    │
+        ┌───────────────────────────┼────────────────────────────┐
+        │                           │                            │
+        ▼                           ▼                            ▼
+ Read Temperature             External Interrupt           SMS Notification
+     (ADC)                     (Local Access)             (UART Interrupt)
+        │                           │                            │
+        ▼                           ▼                            ▼
+Convert ADC to Temp          Password Entered?         New SMS Received?
+        │                     (Keypad Input)                  │
+        ▼                           │                         │
+Compare Temp with               ┌────┴────┐               ┌────┴────┐
+Setpoint                        │         │               │         │
+        │                     Correct   Wrong           Yes        No
+        ▼                         │         │             │          │
+ Temperature > Setpoint?          │         │             │          │
+      ┌─────┴─────┐               │         │             │          │
+      │           │               │         │             │          │
+     YES         NO               │         │             │          │
+      │           │               │         │             │          │
+      ▼           │               ▼         ▼             ▼          │
+Send Temperature  │      Open Local Menu   Send     Read SMS        │
+Alert SMS         │                       Unauthorized   │           │
+      │           │                        Access SMS    ▼           │
+      │           │                                     Verify Mobile Number
+      │           │                                             │
+      │           │                                      ┌──────┴──────┐
+      │           │                                      │             │
+      │           │                                    Valid        Invalid
+      │           │                                      │             │
+      │           │                                      ▼             ▼
+      │           │                             Check SMS Syntax   Send Alert
+      │           │                                      │
+      │           │                            ┌─────────┴──────────┐
+      │           │                            │                    │
+      │           │                         Invalid              Valid
+      │           │                            │                    │
+      │           │                     Display Error              │
+      │           │                                                 ▼
+      │           │                                   Execute SMS Command
+      │           │
+      │           │      ┌────────────────────────────────────────────────────┐
+      │           │      │ T → Update Temperature Setpoint                    │
+      │           │      │ M → Update Authorized Mobile Number                │
+      │           │      │ I → Send Current Temperature                       │
+      │           │      │ S → Send Current System Status                     │
+      │           │      └────────────────────────────────────────────────────┘
+      │           │                          │
+      │           │                          ▼
+      │           │               Update EEPROM (if required)
+      │           │                          │
+      │           │                          ▼
+      │           │                  Send Response SMS
+      │           │
+      │           ▼
+      │    Local Configuration
+      │
+      │    Enter New Setpoint
+      │             │
+      │             ▼
+      │     Update EEPROM
+      │             │
+      │             ▼
+      │     Send Confirmation SMS
+      │
+      └───────────────────────────────┬───────────────────────────────┘
+                                      ▼
+                          Continue Monitoring Loop
 
 ---
 
