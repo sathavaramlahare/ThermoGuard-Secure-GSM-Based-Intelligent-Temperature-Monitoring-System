@@ -26,19 +26,18 @@ The system supports secure remote configuration using password-protected SMS com
 
 ## Hardware Used
 
-- LPC2148 (ARM7TDMI-S)
+- LPC2148
 - LM35 Temperature Sensor
-- GSM Module (SIM800/SIM900)
+- GSM Module (M660A) 
 - 16x2 LCD
 - 4x4 Matrix Keypad
-- AT24Cxx EEPROM
+- AT24LC256 EEPROM
 - Power Supply
 
 ---
 
 ## Software Used
 
-- Embedded C
 - Keil uVision
 - Proteus
 - Flash Magic
@@ -85,24 +84,22 @@ Code/
 
 ## Working
 
-1. Initializes LCD, UART, ADC, I2C, Keypad and GSM module.
-2. Reads stored configuration from EEPROM.
-3. Continuously monitors temperature.
-4. Sends SMS alert when temperature exceeds the threshold.
-5. Receives authenticated SMS commands.
-6. Updates EEPROM settings.
-7. Supports secure local configuration using keypad password.
+1. On power-up, the LPC2148 initializes the LCD, UART, ADC, I2C, Keypad, External Interrupt, and GSM module using AT commands.
+
+2. The system reads the stored temperature setpoint, authorized mobile number, and password from EEPROM. During the first boot, default values are written into EEPROM.
+
+3. The LM35 temperature sensor is continuously monitored using the ADC, and the measured temperature is compared with the stored setpoint.
+
+4. If the measured temperature exceeds the setpoint, the system automatically sends an SMS alert to the authorized mobile number via the GSM module.
+
+5. Incoming SMS notifications are detected through UART interrupts. The controller reads the received SMS, extracts the message, and deletes it from GSM memory after processing.
+
+6. Before executing any command, the sender's mobile number and SMS syntax are verified to ensure that only authorized users can access the system.
+
+7. The system supports secure SMS commands to update the temperature setpoint, change the authorized mobile number, request the current temperature, and retrieve the system status. All configuration changes are stored permanently in EEPROM.
+
+8. Local configuration is protected using a keypad-based password. After successful authentication, users can update the temperature setpoint locally, and the system sends SMS notifications for configuration updates and unauthorized access attempts.
 
 ---
 
-## Future Improvements
-
-- RTC based logging
-- SD Card data storage
-- IoT Cloud Integration
-- Mobile Application
-- CAN Bus Support
-- FreeRTOS implementation
-
----
 
