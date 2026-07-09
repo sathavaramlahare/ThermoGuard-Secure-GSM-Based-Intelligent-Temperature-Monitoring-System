@@ -1,0 +1,11 @@
+void init_i2c(void);
+void I2C_START(void);
+void I2C_STOP(void);
+void I2C_RESTART(void);
+char I2C_nack(void);
+char I2C_mack(void);
+void I2C_write(char data1);
+void i2c_byte_write(char slaveaddr,short int wbuffAddr,char dat);
+char i2c_random_read(char slaveaddr,short int RBuffAddr);
+void i2c_page_write(char slaveaddr,short int wBuffAddr,char *p,char nBytes);
+void i2c_seq_read(char slaveaddr,short int RBuffAddr,char *p,char nBytes);
