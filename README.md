@@ -106,8 +106,3 @@ Code/
 
 ---
 
-## Author
-
-**Lahare Sattavaram**
-
-Embedded Systems | Embedded C | ARM7 | LPC2148 | UART | I2C | SPI | CAN
