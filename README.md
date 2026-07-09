@@ -92,63 +92,68 @@ The system supports secure remote configuration using password-protected SMS com
                                       ▼
                              Enter Infinite Loop
                                       │
-     ┌───────────────────────────────────────────────────────────────────┐
-     │                                  │                                  │
-     ▼                                  ▼                                  ▼
-Read Temperature                External Interrupt                  SMS Notification
-    (ADC)                         (Local Access)                     (UART Interrupt)
-     │                                  │                                  │
-     ▼                                  ▼                                  ▼
-Convert ADC Value              Password Entered?                  New SMS Received?
-to Temperature                  (Keypad Input)                           │
-     │                           ┌──────┴──────┐                         │
-     ▼                           │             │                         │
-Compare with                   Correct       Wrong                      Yes
-Setpoint                        │             │                         │
-     │                           │             │                         ▼
-     ▼                           │             │                 Read SMS Content
-Temperature > Setpoint?          │             │                         │
-     ┌──────┴──────┐             │             │                         ▼
-     │             │             │             │               Verify Mobile Number
-    YES           NO             │             │                 ┌──────┴──────┐
-     │             │             │             │                 │             │
-     ▼             │             ▼             ▼               Valid       Invalid
-Send Alert SMS     │      Open Local Menu   Send SMS            │             │
-     │             │     (Settings Menu)    "Unauthorized"      ▼             ▼
-     │             │                                          Check SMS     Send Alert
-     │             │                                           Syntax          SMS
-     │             │                                      ┌──────┴──────┐
-     │             │                                      │             │
-     │             │                                   Invalid       Valid
-     │             │                                      │             │
-     │             │                                      ▼             ▼
-     │             │                               Display Error   Execute Command
-     │             │                                                  │
-     │             │                                                  ▼
-     │             │                 ┌────────────────────────────────────────────────┐
-     │             │                 │ T → Update Temperature Setpoint               │
-     │             │                 │ M → Update Authorized Mobile Number           │
-     │             │                 │ I → Send Current Temperature                  │
-     │             │                 │ S → Send Current System Status                │
-     │             │                 └────────────────────────────────────────────────┘
-     │             │                                                  │
-     │             │                                                  ▼
-     │             │                                      Update EEPROM (if needed)
-     │             │                                                  │
-     │             │                                                  ▼
-     │             │                                         Send Response SMS
-     │             │
-     │             ▼
-     │      Local Configuration
-     │      ┌───────────────────────────┐
-     │      │ Enter New Setpoint        │
-     │      │ Update EEPROM             │
-     │      │ Send Confirmation SMS     │
-     │      └──────────────┬────────────┘
-     │                     │
-     └─────────────────────┴───────────────────────────────┐
+        ┌───────────────────────┼────────────────────────────┐
+        │                       │                            │
+        ▼                       ▼                            ▼
+ ┌──────────────┐      ┌────────────────┐         ┌────────────────┐
+ │ Read Temp    │      │ External       │         │ SMS Received?  │
+ │ from ADC     │      │ Interrupt      │         │ (UART ISR)     │
+ └──────┬───────┘      │ (Local Access) │         └──────┬─────────┘
+        │              └──────┬─────────┘                │
+        ▼                     ▼                          ▼
+ ┌──────────────┐     ┌────────────────┐        ┌─────────────────┐
+ │ Convert ADC  │     │ Password       │        │ Read SMS        │
+ │ to Temp      │     │ Entered        │        │ Content         │
+ └──────┬───────┘     └──────┬─────────┘        └──────┬──────────┘
+        │                    │                         │
+        ▼               ┌────┴────┐                   ▼
+ ┌──────────────┐       │         │         ┌────────────────────┐
+ │ Compare Temp │    Correct    Wrong       │ Verify Mobile      │
+ │ with Setpoint│       │         │         │ Number             │
+ └──────┬───────┘       │         │         └────────┬───────────┘
+        │               │         │                  │
+   ┌────┴────┐          │         ▼             ┌────┴────┐
+   │         │          │  Send Unauthorized    │         │
+  YES        NO         │      Alert SMS      Valid    Invalid
+   │         │          │                        │         │
+   ▼         │          ▼                        │         ▼
+┌──────────┐ │  ┌────────────────┐              │   Send Alert SMS
+│ Send Temp│ │  │ Open Local     │              │
+│ Alert SMS│ │  │ Settings Menu  │              ▼
+└──────────┘ │  └──────┬─────────┘     ┌────────────────────┐
+             │         │               │ Check SMS Syntax   │
+             │         │               └────────┬───────────┘
+             │         │                   ┌────┴────┐
+             │         │                   │         │
+             │         │                Invalid   Valid
+             │         │                   │         │
+             │         │                   ▼         ▼
+             │         │           Display Error  Execute Command
+             │         │                           │
+             │         │                           ▼
+             │         │        ┌────────────────────────────────────┐
+             │         │        │ T → Update Temperature Setpoint    │
+             │         │        │ M → Update Mobile Number           │
+             │         │        │ I → Send Current Temperature       │
+             │         │        │ S → Send Current System Status     │
+             │         │        └────────────────────────────────────┘
+             │         │                           │
+             │         │                           ▼
+             │         │               Update EEPROM (if required)
+             │         │                           │
+             │         │                           ▼
+             │         │                  Send Response SMS
+             │         │
+             │         ▼
+             │   ┌─────────────────────┐
+             │   │ Local Configuration │
+             │   │ • Enter Setpoint    │
+             │   │ • Update EEPROM     │
+             │   │ • Confirmation SMS  │
+             │   └──────────┬──────────┘
+             └──────────────┴───────────────────────────────┐
                                                             ▼
-                                              Continue Monitoring Loop
+                                             Continue Monitoring Loop
         ---
 
 ## SMS Commands
