@@ -1,4 +1,3 @@
-<img width="1024" height="1536" alt="major flow chart" src="https://github.com/user-attachments/assets/43ab1dc3-b9ad-464b-8155-418d982caad5" /># ThermoGuard: Secure GSM-Based Intelligent Temperature Monitoring System
 
 ## Overview
 
