@@ -3,7 +3,7 @@
 
 ThermoGuard is an ARM7 LPC2148 based Embedded C project that continuously monitors temperature using an LM35 sensor and sends SMS alerts through a GSM module whenever the temperature exceeds a predefined threshold.
 
-The system supports secure remote configuration using password-protected SMS commands and stores user settings in EEPROM, allowing the configuration to persist after power cycles.
+The system supports secure remote configuration using password-protected SMS commands and stores user settings in EEPROM.
 
 ---
 
