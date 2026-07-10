@@ -61,7 +61,7 @@ The system supports secure remote configuration using password-protected SMS com
 | Command | Description |
 |----------|-------------|
 | 1107T250$ | Update temperature setpoint |
-| 1107M9876543210$ | Update mobile number |
+| 1107M9573641321$ | Update mobile number |
 | 1107I$ | Get current temperature |
 | 1107S$ | Get system status |
 
